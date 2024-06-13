@@ -85,11 +85,7 @@ def run_tpot(data_folder, dataset_name, mode = 0, proj = 0):
     y_train = labels_train
     y_test = labels_test
 
-    #scaler = StandardScaler()
-    #X_train = scaler.fit_transform(X_train)
-    #X_test = scaler.transform(X_test)
-
-    tpot = TPOTClassifier(generations=100, population_size=100, early_stop = 5, verbosity=2, random_state=42, n_jobs=-1, max_time_mins  = 60)
+    tpot = TPOTClassifier(generations=100, population_size=100, early_stop = 5, verbosity=2, scoring = 'neg_log_loss', random_state=42, n_jobs=-1, max_time_mins  = 60)
     tpot.fit(X_train, y_train)
 
     score = tpot.score(X_test, y_test)
@@ -97,11 +93,11 @@ def run_tpot(data_folder, dataset_name, mode = 0, proj = 0):
     data_folder = data_folder.replace('export','').replace('/','-')
     mmode = {0: 'concat', 1: 'text', 2: 'kg'}
 
-    with open(f'models/{data_folder}_{dataset_name}_{mmode[mode]}_{proj}.json', 'w') as f:
+    with open(f'results_nll/{data_folder}_{dataset_name}_{mmode[mode]}_{proj}.json', 'w') as f:
         res_dict = {'predicitons' : preds.tolist(), 'dataset': dataset_name, 'true': y_test.tolist(), 'embedding': data_folder, 'mode': mmode[mode], 'dim': proj}
         json.dump(res_dict, f) 
     print(f'Accuracy for dataset {dataset_name}: {score}')
-    tpot.export(os.path.join('results', f'{data_folder}_{dataset_name}_{mmode[mode]}_{proj}.py')) 
+    tpot.export(os.path.join('models_nll', f'{data_folder}_{dataset_name}_{mmode[mode]}_{proj}.py')) 
 
 
 
